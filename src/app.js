@@ -1,9 +1,27 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+const User = require("./models/user");
+const validateSignupData = require("./utils/validation");
+const connectDB = require("./config/database");
+const userAuth = require("./middlewares/authentication");
 const app = express();
 
-app.use("/", (req, res) => {
-  res.send("hello from 3000");
-});
-app.listen(3000, () => {
-  console.log(`server is running at 3000`);
-});
+app.use(express.json());
+app.use(cookieParser());
+
+app.use("/", require("./routes/profile"));
+app.use("/", require("./routes/auth"));
+app.use("/", require("./routes/request"));
+
+connectDB()
+  .then(() => {
+    console.log("db connection successfull");
+    app.listen(3000, () => {
+      console.log(`server is running at 3000`);
+    });
+  })
+  .catch((err) => {
+    console.log(`dsfsf${err.message}`);
+  });
