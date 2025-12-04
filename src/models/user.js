@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema(
       minLength: 4,
       maxLength: 50,
     },
+    photoUrl: {
+      type: String,
+      trim: true,
+    },
     email: {
       type: String,
       required: true,
@@ -46,7 +50,7 @@ const userSchema = new mongoose.Schema(
     gender: {
       type: String,
       validate(value) {
-        if (!["male", "female", "others"].includes(value)) {
+        if (!["Male", "Female", "Others"].includes(value)) {
           throw new Error("gender is not valid");
         }
       },

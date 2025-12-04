@@ -4,9 +4,10 @@ const userAuth = async (req, res, next) => {
   try {
     const { token } = req.cookies;
     if (!token) {
-      throw new Error("Invalid token!");
+      return res.status(401).send("Please Login!");
     }
-    const { _id } = await jwt.verify(token, "sdfkdf@Kjfigdjkg");
+    const decoded = jwt.verify(token, "sdfkdf@Kjfigdjkg");
+    const { _id } = decoded;
     const user = await User.findOne({ _id });
     if (!user) {
       throw new Error("User does not exists!");
@@ -14,7 +15,7 @@ const userAuth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    res.send("Error:" + err.message);
+    res.status(401).send("Error:" + err.message);
   }
 };
 

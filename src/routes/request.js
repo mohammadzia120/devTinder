@@ -20,7 +20,7 @@ router.post(
       if (!user) {
         return res.status(400).send("User does not exists!");
       }
-      const existingConnectionRequest = await ConnectionRequest.find({
+      const existingConnectionRequest = await ConnectionRequest.findOne({
         $or: [
           { fromUserId, toUserId },
           { fromUserId: toUserId, toUserId: fromUserId },
@@ -42,6 +42,32 @@ router.post(
     } catch (err) {
       res.status(400).send(err.message);
     }
+  }
+);
+
+router.post(
+  "/connectionRequest/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    const loggedInUser = req.user;
+    const { status, requestId } = req.params;
+    const allowedStatus = ["accepted", "rejected"];
+    if (!allowedStatus.includes(status)) {
+      return res
+        .status(400)
+        .send({ message: "Status is not allowed", data: loggedInUser });
+    }
+    const connectionRequest = await ConnectionRequest.findOne({
+      _id: requestId,
+      toUserId: loggedInUser._id,
+      status: "interested",
+    });
+    if (!connectionRequest) {
+      return res.status(404).send("Connection request not exist!");
+    }
+    connectionRequest.status = status;
+    const data = await connectionRequest.save();
+    res.send({ message: "connection request " + status, data });
   }
 );
 
