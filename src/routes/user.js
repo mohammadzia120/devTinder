@@ -49,7 +49,7 @@ router.get("/user/connections", userAuth, async (req, res) => {
 
     const data = connections.map((row) => {
       if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
-        //have to convert it to string or use..isequals method
+        //have to convert it to string or use..isequals methodd
         return row.toUserId;
       }
       return row.fromUserId;

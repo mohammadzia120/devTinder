@@ -10,6 +10,9 @@ router.post("/signup", async (req, res) => {
     validateSignupData(req);
     const { firstName, lastName, email, password, age, gender, photoUrl } =
       req.body;
+    if (!email || !password || !firstName) {
+      return res.status(400).send({ error: "Email or password is required!" });
+    }
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = new User({
@@ -21,10 +24,17 @@ router.post("/signup", async (req, res) => {
       gender,
       photoUrl,
     });
-    await user.save();
-    res.send("Data inserted successfully!");
+    const savedUser = await user.save();
+    const token = await savedUser.getJWT();
+    if (!token) {
+      throw new Error("Invalid token");
+    }
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 8 * 3600000),
+    });
+    res.send({ message: "Data inserted successfully!", data: savedUser });
   } catch (err) {
-    res.send(err.message);
+    res.status(400).send(err.message);
   }
 });
 
