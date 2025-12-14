@@ -9,6 +9,8 @@ const connectDB = require("./config/database");
 const userAuth = require("./middlewares/authentication");
 const app = express();
 
+require("dotenv").config();
+
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -26,7 +28,7 @@ app.use("/", require("./routes/user"));
 connectDB()
   .then(() => {
     console.log("db connection successfull");
-    app.listen(3000, () => {
+    app.listen(process.env.PORT, () => {
       console.log(`server is running at 3000`);
     });
   })
